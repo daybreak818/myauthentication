@@ -25,8 +25,7 @@ public class SensorPredictingService extends Service implements SensorEventListe
     }
 
     public static double confidence;
-  //  public static NGramModel model;
-    public static SVM model;
+    public static SVM sensormodel;
 
     public static double INTERVAL = 10;
     public static double WINDOW_INTERVAL = 2;
@@ -36,15 +35,11 @@ public class SensorPredictingService extends Service implements SensorEventListe
 
     public final String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Auth/Sensor/";
     public final String modelFilename = dir + "Model.txt";
-   // public final String centroidsFilename = dir + "Centroids.txt";
     public final String trainFvFilename = dir + "FeatureVectors.txt";
 
-    //public final String accDir = dir + "Test/Acc/";
+;
     public final String accDir = dir + "Acc/";
-    //public final String magDir = dir + "Test/Mag/";
     public final String magDir = dir + "Mag/";
-    //public final String gyrDir = dir + "Test/Gyr/";
-    //public final String featureVectorsFilename = dir + "Test/FeatureVectors.txt";
     public final String gyrDir = dir + "Gyr/";
     public final String featureVectorsFilename = dir + "FeatureVectors.txt";
 
@@ -71,25 +66,23 @@ public class SensorPredictingService extends Service implements SensorEventListe
         FileUtils.makeRootDirectory(magDir);
         FileUtils.makeRootDirectory(gyrDir);
 
-        if (model == null) {
-            try {
-                double[][] nums = FileUtils.readFileToMatrix(modelFilename);
+        if (sensormodel == null) {
+                //double[][] nums = FileUtils.readFileToMatrix(modelFilename);
                 //double[][] centroids = FileUtils.readFileToMatrix(centroidsFilename);
                 //model = new NGramModel(nums, centroids, NUM_OF_N);
-                model = new SVM();
-            } catch (Exception e) {
-                double[][] fv = FileUtils.readFileToMatrix(trainFvFilename);
+                sensormodel = new SVM();
+                double[][] fv = FileUtils.readSvmFileToMatrix(trainFvFilename);
                 //构造标签向量
                 // model = new NGramModel(NUM_OF_CENTROIDS, NUM_OF_N);
+                //sensormodel = new SVM();
                 double[] sensorLabel = new double[fv.length];
                 for (int i = 0; i < sensorLabel.length; ++i) {
                              sensorLabel[i] = 1;
                           }
-                model = new SVM();
-                model.train(fv,sensorLabel);
-                model.save(model,modelFilename);
+                //sensormodel = new SVM();
+                sensormodel.train(fv,sensorLabel);
+                sensormodel.save(sensormodel,modelFilename);
                 //model.saveCentroids(centroidsFilename);
-            }
         }
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -114,8 +107,6 @@ public class SensorPredictingService extends Service implements SensorEventListe
 
                             List<List<Double>> accData = accRawData;
                             accRawData = new ArrayList<>();
-   //                         List<List<Double>> oriData = oriRawData;
-    //                        oriRawData = new ArrayList<>();
                             List<List<Double>> magData = magRawData;
                             magRawData = new ArrayList<>();
                             List<List<Double>> gyrData = gyrRawData;
@@ -131,7 +122,6 @@ public class SensorPredictingService extends Service implements SensorEventListe
                                 groupCount = 0;
 
                                 double[][] acc = DataUtils.listToArray(accTempData);
-      //                          double[][] ori = DataUtils.listToArray(oriTempData);
                                 double[][] mag = DataUtils.listToArray(magTempData);
                                 double[][] gyr = DataUtils.listToArray(gyrTempData);
 
@@ -151,8 +141,10 @@ public class SensorPredictingService extends Service implements SensorEventListe
                                 }).start();
                                 double positiveSum = 0;
                                 for (double[] vector : featureVectors) {
-                                    double ans = model.predict(vector);
-                                    positiveSum += ans;
+                                    double ans = sensormodel.predict(vector);
+                                    if(ans == 1) {
+                                        positiveSum += ans;
+                                    }
                                 }
                                 //看超过正确的比例
                                 //featureVectors.length指的是featureVectors的行个数
@@ -161,7 +153,6 @@ public class SensorPredictingService extends Service implements SensorEventListe
                                // confidence = model.predict(featureVectors);
 
                                 accTempData = new ArrayList<>();
-      //                          oriTempData = new ArrayList<>();
                                 magTempData = new ArrayList<>();
                                 gyrTempData = new ArrayList<>();
                             }
@@ -235,15 +226,11 @@ public class SensorPredictingService extends Service implements SensorEventListe
             @Override
             public void run() {
                 String accFilename = accDir + currentTime + ".txt";
- //               String oriFilename = oriDir + currentTime + ".txt";
                 String magFilename = magDir + currentTime + ".txt";
                 String gyrFilename = gyrDir + currentTime + ".txt";
                 for (double[] line : acc) {
                     FileUtils.writeFileFromNums(accFilename, line, true, true, 1);
                 }
-    //            for (double[] line : ori) {
-     //               FileUtils.writeFileFromNums(oriFilename, line, true, false, 1);
-      //          }
                 for (double[] line : mag) {
                     FileUtils.writeFileFromNums(magFilename, line, true, true, 1);
                 }

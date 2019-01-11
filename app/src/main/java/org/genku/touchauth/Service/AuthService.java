@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.genku.touchauth.Util.FileUtils;
@@ -21,18 +22,18 @@ public class AuthService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-/*        try {
-            stopService(new Intent(this, TouchDataCollectingService.class));
-            stopService(new Intent(this, SensorDataCollectingService.class));
-            stopService(new Intent(this, TouchPredictingService.class));
-            stopService(new Intent(this, SensorPredictingService.class));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-*/
-  //      startService(new Intent(this, TouchPredictingService.class));
-        startService(new Intent(this, SensorPredictingService.class));
+       try {
+            //stopService(new Intent(this, TouchDataCollectingService.class));
+            //stopService(new Intent(this, SensorDataCollectingService.class));
+            //stopService(new Intent(this, TouchPredictingService.class));
+            //stopService(new Intent(this, SensorPredictingService.class));
 
+  //      startService(new Intent(this, TouchPredictingService.class));
+
+        //startService(new Intent(this, SensorPredictingService.class));
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -56,9 +57,11 @@ public class AuthService extends Service {
                   if(sensorConfidence>0.5){
                     Toast.makeText(getApplicationContext(), "True", Toast.LENGTH_SHORT).show();
                     FileUtils.writeFile(authResultFilename, "True\r\n", true);
+                    Log.d("authtag","auth结束-True");
                 } else {
-                    Toast.makeText(getApplicationContext(), "False", Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(getApplicationContext(), "False", Toast.LENGTH_SHORT).show();
                     FileUtils.writeFile(authResultFilename, "False\r\n", true);
+                    Log.d("authtag","auth结束-False");
                 }
             }
         } catch (Exception e) {

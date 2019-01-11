@@ -1,6 +1,7 @@
 package org.genku.touchauth.Model;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import libsvm.svm;
 import libsvm.svm_model;
@@ -71,8 +72,9 @@ public class SVM {
         problem.l = rows;
         problem.x = data;
         problem.y = labels;
-
+        Log.d("Traintag","Train开始");
         model = svm.svm_train(problem, param);
+        Log.d("Traintag","Train结束了");
     }
 
     public double predict(double[] vector) {

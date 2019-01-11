@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onTrainStartButtonClick(View view) {
         Log.d("Traintag","训练已经开始运行了");
-       // Toast.makeText(this, "Training Start...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Training Start...", Toast.LENGTH_SHORT).show();
         //准备数据
         Log.d("Traintag","Toast数据已经过了");
         String dir  = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Auth/";
@@ -100,10 +100,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void onTestStartButtonClick(View view) {
 
-        Toast.makeText(this, " Start...", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent();
-        intent.setClass(this, AuthService.class);
-        startService(intent);
+       // Toast.makeText(this, " Start...", Toast.LENGTH_SHORT).show();
+        Log.d("Testtag","Test开始");
+        Intent intent2 = new Intent();
+        intent2.setClass(this, SensorPredictingService.class);
+        startService(intent2);
+        Intent intent3 = new Intent();
+        intent3.setClass(this, AuthService.class);
+        startService(intent3);
+        Log.d("Testtag","Test结束");
     }
 
     public void onStopButtonClick(View view) {

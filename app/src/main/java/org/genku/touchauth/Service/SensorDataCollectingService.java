@@ -87,20 +87,20 @@ public class SensorDataCollectingService extends Service implements SensorEventL
                             magTempData.addAll(magData);
                             gyrTempData.addAll(gyrData);
                             ++groupCount;
+                            try {
+                                if (groupCount == MAX_GROUP_COUNT) {
 
-                            if (groupCount == MAX_GROUP_COUNT) {
-
-                                groupCount = 0;
-                                //System.out.print("acctemp数据"+ accTempData);
-                                //System.out.print("magtemp数据"+ magTempData);
-                                //System.out.print("gyrtemp数据"+ gyrTempData);
-                                double[][] acc = DataUtils.listToArray(accTempData);
-                                double[][] mag = DataUtils.listToArray(magTempData);
-                                double[][] gyr = DataUtils.listToArray(gyrTempData);
-                                 System.out.println("acc数据"+ acc);
-                                 System.out.println("mag数据"+ magData);
-                                 System.out.println("gyr数据"+ gyrData);
-                                saveRawFile(currentTime, acc, mag, gyr);
+                                    groupCount = 0;
+                                    //System.out.print("acctemp数据"+ accTempData);
+                                    //System.out.print("magtemp数据"+ magTempData);
+                                    //System.out.print("gyrtemp数据"+ gyrTempData);
+                                    double[][] acc = DataUtils.listToArray(accTempData);
+                                    double[][] mag = DataUtils.listToArray(magTempData);
+                                    double[][] gyr = DataUtils.listToArray(gyrTempData);
+                                    System.out.println("acc数据" + accData);
+                                    System.out.println("mag数据" + magData);
+                                    System.out.println("gyr数据" + gyrData);
+                                    saveRawFile(currentTime, acc, mag, gyr);
 
                                 final double[][] featureVectors = SensorFeatureExtraction.extract(
                                         INTERVAL * MAX_GROUP_COUNT,
@@ -120,6 +120,9 @@ public class SensorDataCollectingService extends Service implements SensorEventL
                                 accTempData = new ArrayList<>();
                                 magTempData = new ArrayList<>();
                                 gyrTempData = new ArrayList<>();
+                            }
+                            }catch(Exception e){
+                                e.printStackTrace();
                             }
                         }
                     }
@@ -196,13 +199,13 @@ public class SensorDataCollectingService extends Service implements SensorEventL
                 String magFilename = magDir + currentTime + ".txt";
                 String gyrFilename = gyrDir + currentTime + ".txt";
                 for (double[] line : acc) {
-                    FileUtils.writeFileFromNums(accFilename, line, true, false, 1);
+                    FileUtils.writeFileFromNums(accFilename, line, true, true, 1);
                 }
                 for (double[] line : mag) {
-                    FileUtils.writeFileFromNums(magFilename, line, true, false, 1);
+                    FileUtils.writeFileFromNums(magFilename, line, true, true, 1);
                 }
                 for (double[] line : gyr) {
-                    FileUtils.writeFileFromNums(gyrFilename, line, true, false, 1);
+                    FileUtils.writeFileFromNums(gyrFilename, line, true, true, 1);
                 }
             }
         }).start();
