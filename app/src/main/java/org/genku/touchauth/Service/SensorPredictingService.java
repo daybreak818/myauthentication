@@ -8,12 +8,14 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Environment;
 import android.os.IBinder;
+import android.util.Log;
 
-import org.genku.touchauth.Model.NGramModel;
+//import org.genku.touchauth.Model.NGramModel;
 import org.genku.touchauth.Model.SVM;
 import org.genku.touchauth.Model.SensorFeatureExtraction;
 import org.genku.touchauth.Util.DataUtils;
 import org.genku.touchauth.Util.FileUtils;
+import org.genku.touchauth.libsvm.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,7 @@ public class SensorPredictingService extends Service implements SensorEventListe
     }
 
     public static double confidence;
-    public static SVM sensormodel;
+    public static SVM model;
 
     public static double INTERVAL = 10;
     public static double WINDOW_INTERVAL = 2;
@@ -58,19 +60,19 @@ public class SensorPredictingService extends Service implements SensorEventListe
     private static int MAX_GROUP_COUNT = 2;
 
 
-
     @Override
     public int onStartCommand(Intent intent, int flags, final int startId) {
 
+        Log.d("sensorpredicttag","sensorpredict开始");
         FileUtils.makeRootDirectory(accDir);
         FileUtils.makeRootDirectory(magDir);
         FileUtils.makeRootDirectory(gyrDir);
 
-        if (sensormodel == null) {
+        if (model == null) {
                 //double[][] nums = FileUtils.readFileToMatrix(modelFilename);
                 //double[][] centroids = FileUtils.readFileToMatrix(centroidsFilename);
                 //model = new NGramModel(nums, centroids, NUM_OF_N);
-                sensormodel = new SVM();
+                model = new SVM();
                 double[][] fv = FileUtils.readSvmFileToMatrix(trainFvFilename);
                 //构造标签向量
                 // model = new NGramModel(NUM_OF_CENTROIDS, NUM_OF_N);
@@ -80,8 +82,8 @@ public class SensorPredictingService extends Service implements SensorEventListe
                              sensorLabel[i] = 1;
                           }
                 //sensormodel = new SVM();
-                sensormodel.train(fv,sensorLabel);
-                sensormodel.save(sensormodel,modelFilename);
+                model.train(fv,sensorLabel);
+                model.save(model,modelFilename);
                 //model.saveCentroids(centroidsFilename);
         }
 
@@ -93,10 +95,10 @@ public class SensorPredictingService extends Service implements SensorEventListe
                 sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_FASTEST);
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_FASTEST);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+//先把线程去掉
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
                 Long startTime = System.currentTimeMillis();
                 groupCount = 0;
                 try {
@@ -130,18 +132,18 @@ public class SensorPredictingService extends Service implements SensorEventListe
                                 final double[][] featureVectors = SensorFeatureExtraction.extract(
                                         INTERVAL * MAX_GROUP_COUNT,
                                         2, acc,  mag, gyr);
-
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
+                                 //先把这里的线程删掉
+                                //new Thread(new Runnable() {
+                                 //   @Override
+                                  //  public void run() {
                                         for (double[] line : featureVectors) {
                                             FileUtils.writeFileFromNums(featureVectorsFilename, line, true, true, 1);
                                         }
-                                    }
-                                }).start();
+                                    //}
+                                //}).start();
                                 double positiveSum = 0;
                                 for (double[] vector : featureVectors) {
-                                    double ans = sensormodel.predict(vector);
+                                    double ans = model.predict(vector);
                                     if(ans == 1) {
                                         positiveSum += ans;
                                     }
@@ -161,8 +163,8 @@ public class SensorPredictingService extends Service implements SensorEventListe
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
-        }).start();
+//            }
+//        }).start();
 
         return super.onStartCommand(intent, flags, startId);
     }

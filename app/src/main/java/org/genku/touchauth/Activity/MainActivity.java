@@ -26,7 +26,7 @@ import org.genku.touchauth.Util.FileUtils;
 
 public class MainActivity extends AppCompatActivity {
 //创建了一下sensor模型变量
-      public static SVM sensorModel;
+      public static SVM Model;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //初始化初始界面
@@ -91,9 +91,9 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < sensorLabel.length; ++i) {
             sensorLabel[i] = 1;
         }
-        sensorModel = new SVM();
-        sensorModel.train(fv,sensorLabel);
-        sensorModel.save(sensorModel,modelFilename);
+        Model = new SVM();
+        Model.train(fv,sensorLabel);
+        Model.save(Model,modelFilename);
 
         Toast.makeText(this, "Training End!", Toast.LENGTH_SHORT).show();
     }
@@ -102,9 +102,9 @@ public class MainActivity extends AppCompatActivity {
 
        // Toast.makeText(this, " Start...", Toast.LENGTH_SHORT).show();
         Log.d("Testtag","Test开始");
-        Intent intent2 = new Intent();
-        intent2.setClass(this, SensorPredictingService.class);
-        startService(intent2);
+        //Intent intent2 = new Intent();
+       // intent2.setClass(this, SensorPredictingService.class);
+        //startService(intent2);
         Intent intent3 = new Intent();
         intent3.setClass(this, AuthService.class);
         startService(intent3);

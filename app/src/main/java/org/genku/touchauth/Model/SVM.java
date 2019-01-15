@@ -3,12 +3,12 @@ package org.genku.touchauth.Model;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import libsvm.svm;
-import libsvm.svm_model;
-import libsvm.svm_node;
-import libsvm.svm_parameter;
-import libsvm.svm_problem;
-
+//import libsvm.svm;
+//import libsvm.svm_model;
+//import libsvm.svm_node;
+//import libsvm.svm_parameter;
+//import libsvm.svm_problem;
+import org.genku.touchauth.libsvm.*;
 /**
  * Created by genku on 4/9/2017.
  */
@@ -17,7 +17,7 @@ public class SVM {
 
 
     private svm_parameter param;
-    private svm_model model;
+    public svm_model model;
 
     private svm_problem problem;
 
@@ -78,6 +78,23 @@ public class SVM {
     }
 
     public double predict(double[] vector) {
+
+        int cols = vector.length;
+
+        svm_node[] data = new svm_node[cols];
+        for (int i = 0; i < cols; ++i) {
+            data[i] = new svm_node();
+            data[i].index = i + 1;
+            data[i].value = vector[i];
+        }
+
+        double[] probs = new double[2];
+        double label = svm.svm_predict(model, data);
+
+        return label;
+    }
+    //补充函数
+    public double predict1(SVM model_,double[] vector) {
 
         int cols = vector.length;
 

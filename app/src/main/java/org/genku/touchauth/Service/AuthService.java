@@ -13,7 +13,7 @@ public class AuthService extends Service {
 
     public static final int INTERVAL = 4;
 
-    private static final String authResultFilename = Environment.getExternalStorageDirectory().getAbsolutePath() + "Auth/AuthResult.txt";
+    private static final String authResultFilename = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Auth/AuthResult.txt";
 
 
     public AuthService() {
@@ -29,17 +29,20 @@ public class AuthService extends Service {
             //stopService(new Intent(this, SensorPredictingService.class));
 
   //      startService(new Intent(this, TouchPredictingService.class));
-
-        //startService(new Intent(this, SensorPredictingService.class));
+           //Intent intent3 = new Intent();
+           //intent3.setClass(this, SensorPredictingService.class);
+           //startService(intent3);
+        startService(new Intent(this, SensorPredictingService.class));
        } catch (Exception e) {
            e.printStackTrace();
        }
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+       //把线程先去掉
+       // new Thread(new Runnable() {
+            //@Override
+            //public void run() {
                 predict();
-            }
-        }).start();
+            //}
+        //}).start();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -55,7 +58,7 @@ public class AuthService extends Service {
       //         if (touchConfidence > 2 && sensorConfidence > 0) {
                 //判别中超过半数则认为是正确的
                   if(sensorConfidence>0.5){
-                    Toast.makeText(getApplicationContext(), "True", Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(getApplicationContext(), "True", Toast.LENGTH_SHORT).show();
                     FileUtils.writeFile(authResultFilename, "True\r\n", true);
                     Log.d("authtag","auth结束-True");
                 } else {
