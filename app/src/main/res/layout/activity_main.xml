@@ -18,26 +18,26 @@
 
     <Button
         android:id="@+id/train_start_button"
-        android:layout_width="wrap_content"
+        android:layout_width="78dp"
         android:layout_height="wrap_content"
+        android:layout_margin="5dp"
         android:onClick="onTrainStartButtonClick"
-        android:text="Train"
-        android:layout_margin="5dp"/>
+        android:text="Train" />
 
     <Button
         android:id="@+id/test_start_button"
-        android:layout_width="wrap_content"
+        android:layout_width="77dp"
         android:layout_height="wrap_content"
+        android:layout_margin="5dp"
         android:onClick="onTestStartButtonClick"
-        android:text="Test"
-        android:layout_margin="5dp"/>
+        android:text="Test" />
 
     <Button
         android:id="@+id/stop_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="5dp"
         android:onClick="onStopButtonClick"
-        android:text="Stop"
-        android:layout_margin="5dp"/>
+        android:text="Stop" />
 
 </LinearLayout>

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.genku.touchauth">
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+    <uses-feature android:name="android.hardware.camera.autofocus"/>
+    <uses-permission android:name="android.permission.CAMERA"  />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.BODY_SENSORS"/>
@@ -18,11 +21,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity android:name = ".Activity.CameraActivity"
+            android:theme="@android:style/Theme.Translucent">
+        <!-- theme设置成全透明 -->
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
         <service
         android:name=".Service.SensorDataCollectingService"
         android:enabled="true"
         android:exported="true" />
+        <service
+            android:name=".Service.FaceDataRecognitionService"
+            android:enabled="true"
+            android:exported="true"  />
         <service
             android:name=".Service.SensorPredictingService"
             android:enabled="true"

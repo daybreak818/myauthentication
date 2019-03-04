@@ -1,6 +1,8 @@
 package org.genku.touchauth.Util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -87,16 +89,30 @@ public class DataUtils {
         }
         int n = list.size();
         int m = list.get(0).size();
+        //System.out.println(n);
+        //System.out.println(m);
         double ans[][] = new double[n][m];
         int i = 0, j = 0;
         for (List<Double> line : list) {
             j = 0;
+            //System.out.println(line.size());
             for (Double item : line) {
                 ans[i][j++] = item;
             }
             ++i;
         }
         return ans;
+    }
+    public static List<List<Double>> ArrayTolist(double[][] arr){
+    	List<List<Double>> resultList = new ArrayList<>();
+    	List<Double> rl = new ArrayList<>();
+    	for(double[] subarr : arr) {
+    		for(double s : subarr) {
+    			rl.add(s);
+    		}
+    		resultList.add(rl);
+    	}
+    	return resultList;
     }
 
 

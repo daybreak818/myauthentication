@@ -1,12 +1,10 @@
 package org.genku.touchauth.Model;
 
 import org.genku.touchauth.Util.AlgorithmUtils;
-import org.genku.touchauth.Util.Jama.Complex;
-import org.genku.touchauth.Util.Jama.FFT;
+//import org.genku.touchauth.Util.Jama.Complex;
 import org.genku.touchauth.Util.MathUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,19 +15,19 @@ public class SensorWindow {
     private static final int[] MEDIAN_FLAG              = { 1,1,1, 1,1,1, 1,1,1 };
     private static final int[] VAR_FLAG                 = { 1,1,1, 1,1,1, 1,1,1 };
     private static final int[] MODE_FLAG                = { 0,0,0, 0,0,0, 0,0,0 };
-    private static final int[] SKEWNESS_FLAG            = { 1,1,1, 0,0,0, 0,0,0 };
-    private static final int[] KURTOSIS_FLAG            = { 1,1,1, 0,1,0, 1,1,1 };
+    private static final int[] SKEWNESS_FLAG            = { 0,0,0, 0,0,0, 0,0,0 };
+    private static final int[] KURTOSIS_FLAG            = { 0,0,0, 0,0,0, 0,0,0 };
     private static final int[] MAX_FLAG                 = { 1,1,1,  1,1,1, 1,1,1 };
     private static final int[] MIN_FLAG                 = { 1,1,1, 1,1,1, 1,1,1 };
-    private static final int[] NUMOFLOCALPEAKS_FLAG     = { 1,1,1,  1,1,1, 1,1,1 };
-    private static final int[] NUMOFLOCALCRESTS_FLAG    = { 1,1,1,  1,1,1, 1,1,1 };
-    private static final int[] PRCTILE_FLAG             = { 0,0,0,0,0, 0,0,1,0,1, 1,0,1,0,1,
-                                                            0,0,0,0,1, 1,1,1,1,1, 0,0,1,1,1,
+    private static final int[] NUMOFLOCALPEAKS_FLAG     = { 0,0,0, 0,0,0, 0,0,0 };
+    private static final int[] NUMOFLOCALCRESTS_FLAG    = { 0,0,0,  0,0,0, 0,0,0 };
+    private static final int[] PRCTILE_FLAG             = { 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0,
+                                                            0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0,
                                                             0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0 };
-    private static final int[] COMBSINGNALMAGI_FLAG     = { 1, 0, 0 };
-    private static final int[] FFT_FLAG                 = { 1,1,1,0,1,1,1,0, 1,0,0,0,0,0,0,0, 1,1,0,0,0,0,0,0,
-                                                            1,1,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,0,0,0,0,
-                                                            1,1,1,0,1,1,1,1, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0 };
+    private static final int[] COMBSINGNALMAGI_FLAG     = { 0, 0, 0 };
+    private static final int[] FFT_FLAG                 = { 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
+                                                            0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
+                                                            0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0 };
     private double[] featureVector;
 
     public SensorWindow(double[][] acc,  double[][] mag, double[][] gyr) {

@@ -2,6 +2,8 @@ package org.genku.touchauth.Util.Jama;
 
 //import com.biolab.node.nexTest.Jama.*;
 
+import Jama.Matrix;
+
 /** Eigenvalues and eigenvectors of a real matrix.
 <P>
     If A is symmetric, then A = V*D*V' where the eigenvalue matrix D is

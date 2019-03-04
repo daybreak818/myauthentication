@@ -1,8 +1,7 @@
 package org.genku.touchauth.Util;
 
-import org.genku.touchauth.Util.Jama.Complex;
-import org.genku.touchauth.Util.Jama.FFT;
-
+import org.genku.touchauth.Util.Jama.*;
+import org.genku.touchauth.Util.AlgorithmUtils.*;
 import java.util.HashMap;
 import java.util.Map;
 

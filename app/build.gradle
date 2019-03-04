@@ -28,4 +28,8 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.1'
     testCompile 'junit:junit:4.12'
     compile files('libs/libsvm.jar')
+    compile files('libs/facerecognition.jar')
+    compile files('libs/android-extend.jar')
+    compile files('libs/facedetection.jar')
+    compile files('libs/facetracking.jar')
 }

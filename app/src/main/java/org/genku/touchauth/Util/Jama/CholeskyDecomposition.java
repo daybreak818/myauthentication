@@ -1,6 +1,8 @@
 package org.genku.touchauth.Util.Jama;
 
-   /** Cholesky Decomposition.
+import Jama.Matrix;
+
+/** Cholesky Decomposition.
    <P>
    For a symmetric, positive definite matrix A, the Cholesky decomposition
    is an lower triangular matrix L so that A = L*L'.

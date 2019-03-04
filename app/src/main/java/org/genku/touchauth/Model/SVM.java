@@ -27,12 +27,12 @@ public class SVM {
         param.svm_type = svm_parameter.ONE_CLASS;
         param.kernel_type = svm_parameter.RBF;
         param.degree = 3;
-        param.gamma = 0;	// 1/num_features
-        param.coef0 = 0;
-        param.nu = 0.5;
-        param.cache_size = 100;
+        param.gamma = 0.001;	// 1/num_features
+        param.coef0 = 0.0;
+        param.nu = 0.001;
+        param.cache_size = 200;
         param.C = 1;
-        param.eps = 1e-3;
+        param.eps = 1e-5;
         param.p = 0.1;
         param.shrinking = 1;
         param.probability = 0;
@@ -88,7 +88,7 @@ public class SVM {
             data[i].value = vector[i];
         }
 
-        double[] probs = new double[2];
+        //double[] probs = new double[2];
         double label = svm.svm_predict(model, data);
 
         return label;

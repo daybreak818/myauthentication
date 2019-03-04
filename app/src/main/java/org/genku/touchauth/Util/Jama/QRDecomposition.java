@@ -1,6 +1,8 @@
 package org.genku.touchauth.Util.Jama;
 
 
+import Jama.Matrix;
+
 /** QR Decomposition.
 <P>
    For an m-by-n matrix A with m >= n, the QR decomposition is an m-by-n

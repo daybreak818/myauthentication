@@ -96,9 +96,9 @@ public class SensorPredictingService extends Service implements SensorEventListe
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_FASTEST);
 //先把线程去掉
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
                 Long startTime = System.currentTimeMillis();
                 groupCount = 0;
                 try {
@@ -128,30 +128,30 @@ public class SensorPredictingService extends Service implements SensorEventListe
                                 double[][] gyr = DataUtils.listToArray(gyrTempData);
 
                                 saveRawFile(currentTime, acc, mag, gyr);
-
+                                //新采集的数据
                                 final double[][] featureVectors = SensorFeatureExtraction.extract(
                                         INTERVAL * MAX_GROUP_COUNT,
                                         2, acc,  mag, gyr);
+
                                  //先把这里的线程删掉
-                                //new Thread(new Runnable() {
-                                 //   @Override
-                                  //  public void run() {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
                                         for (double[] line : featureVectors) {
                                             FileUtils.writeFileFromNums(featureVectorsFilename, line, true, true, 1);
                                         }
-                                    //}
-                                //}).start();
+                                    }
+                                }).start();
                                 double positiveSum = 0;
                                 for (double[] vector : featureVectors) {
                                     double ans = model.predict(vector);
                                     if(ans == 1) {
-                                        positiveSum += ans;
+                                        positiveSum =positiveSum + ans;
                                     }
                                 }
                                 //看超过正确的比例
                                 //featureVectors.length指的是featureVectors的行个数
                                 confidence = positiveSum / featureVectors.length;
-                                //return positiveSum > 2;
                                // confidence = model.predict(featureVectors);
 
                                 accTempData = new ArrayList<>();
@@ -163,8 +163,8 @@ public class SensorPredictingService extends Service implements SensorEventListe
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-//            }
-//        }).start();
+            }
+        }).start();
 
         return super.onStartCommand(intent, flags, startId);
     }
