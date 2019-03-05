@@ -230,14 +230,19 @@ public class SensorPredictingService extends Service implements SensorEventListe
                 String accFilename = accDir + currentTime + ".txt";
                 String magFilename = magDir + currentTime + ".txt";
                 String gyrFilename = gyrDir + currentTime + ".txt";
-                for (double[] line : acc) {
-                    FileUtils.writeFileFromNums(accFilename, line, true, true, 1);
+                if(acc!=null&mag!=null&gyr!=null) {
+                    for (double[] line : acc) {
+                        FileUtils.writeFileFromNums(accFilename, line, true, true, 1);
+                    }
+                    for (double[] line : mag) {
+                        FileUtils.writeFileFromNums(magFilename, line, true, true, 1);
+                    }
+                    for (double[] line : gyr) {
+                        FileUtils.writeFileFromNums(gyrFilename, line, true, true, 1);
+                    }
                 }
-                for (double[] line : mag) {
-                    FileUtils.writeFileFromNums(magFilename, line, true, true, 1);
-                }
-                for (double[] line : gyr) {
-                    FileUtils.writeFileFromNums(gyrFilename, line, true, true, 1);
+                else{
+                    Thread.interrupted();
                 }
             }
         }).start();

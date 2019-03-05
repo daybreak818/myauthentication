@@ -1,5 +1,6 @@
 package org.genku.touchauth.Service;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Service;
 import android.bluetooth.BluetoothClass;
@@ -9,10 +10,13 @@ import android.content.ContentValues;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Picture;
 import android.graphics.Rect;
 import android.hardware.Camera;
+import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.Message;
@@ -29,6 +33,7 @@ import com.guo.android_extend.image.ImageConverter;
 
 import java.io.File;
 import android.net.Uri;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import org.genku.touchauth.Activity.CameraActivity;
@@ -36,6 +41,7 @@ import org.genku.touchauth.Model.Application;
 import org.genku.touchauth.Model.Application.*;
 import org.genku.touchauth.Model.CameraWindow;
 import org.genku.touchauth.Model.FaceDB;
+import org.genku.touchauth.R;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -44,17 +50,18 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import static android.app.Activity.RESULT_OK;
-import static org.genku.touchauth.Activity.CameraActivity.cActivity;
+//import static org.genku.touchauth.Activity.CameraActivity.cActivity;
 
 
-public  class FaceDataRecognitionService extends Service implements Camera.PictureCallback {
+public class FaceDataRecognitionService extends Service implements Camera.PictureCallback {
     private  static final String TAG = "FDRS";
-    private Context context;
+    public static Context context;
     private AppCompatActivity mActivity;
     private Camera mCamera;
     private String commandId;
     private boolean isRunning;
     public static float score;
+    private final SurfaceHolder mHolder = null;
     public FaceDataRecognitionService() {
 
     }
@@ -82,12 +89,9 @@ public  class FaceDataRecognitionService extends Service implements Camera.Pictu
     //service主代码
     //得在执行完毕后自动停止
    public int onStartCommand(final Intent intent, int flags, final int startId) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
                 //如果存在注册过的特征，则直接进行比对
                 //如果没有存在注册过的特征，则注册并提取特征
-                if(!new File( enrollFilename).exists()){
+                if(!new File( enrollFilename).exists()) {
                     Log.d(TAG, "Don't enroll!");
                     //开始注册
                     /*
@@ -121,38 +125,48 @@ public  class FaceDataRecognitionService extends Service implements Camera.Pictu
                     }).start();
                     //解编码图像
                     */
-                    startTakePic(intent);
-                    mBitmap = Application.decodeImage(enrollFilename);
-                    //转换图像为NV21格式
-                    byte[] data = new byte[mBitmap.getWidth() * mBitmap.getHeight() * 3 / 2];
-                    ImageConverter convert = new ImageConverter();
-                    convert.initial(mBitmap.getWidth(), mBitmap.getHeight(), ImageConverter.CP_PAF_NV21);
-                    if (convert.convert(mBitmap, data)) {
-                        Log.d(TAG, "convert ok!");
-                    }
-                    convert.destroy();
-                    //得到了图像数据，提取信息
-                    //首先，初始化人脸识别引擎
-                    AFR_FSDKEngine rengine = new AFR_FSDKEngine();
-                    AFR_FSDKFace face = new AFR_FSDKFace();
-                    AFR_FSDKError rerror = rengine.AFR_FSDK_InitialEngine(FaceDB.appid,FaceDB.fr_key);
-                    //List<AFR_FSDKFace> rresult = new ArrayList<AFR_FSDKFace>();
-                    AFR_FSDKFace rresult = new AFR_FSDKFace();
-                    AFD_FSDKEngine dengine = new AFD_FSDKEngine();
-                    AFD_FSDKError derror = dengine.AFD_FSDK_InitialFaceEngine(FaceDB.appid, FaceDB.fd_key,AFD_FSDKEngine.AFD_OPF_0_HIGHER_EXT, 16, 5);
-                    List<AFD_FSDKFace> dresult = new ArrayList<AFD_FSDKFace>();
-                    Log.d("com.arcsoft", "AFR_FSDK_InitialEngine = " + rerror.getCode());
-                    Log.d("com.arcsoft", "AFD_FSDK_InitialFaceEngine = " + derror.getCode());
-                    //提取特征注册用户
-                    derror  = dengine.AFD_FSDK_StillImageFaceDetection(data, mBitmap.getWidth(), mBitmap.getHeight(), AFD_FSDKEngine.CP_PAF_NV21, dresult);
-                    rerror = rengine.AFR_FSDK_ExtractFRFeature(data, mBitmap.getWidth(), mBitmap.getHeight(), AFR_FSDKEngine.CP_PAF_NV21, new Rect(dresult.get(0).getRect()),AFR_FSDKEngine.AFR_FOC_0, face);
-                    Log.d("com.arcsoft", "Face=" + face.getFeatureData()[0]+ "," + face.getFeatureData()[1] + "," + face.getFeatureData()[2] + "," + rerror.getCode());
-                    //将人脸注册到人脸库中
-                    FaceDB.addFace("genuine",face);
-                    derror = dengine.AFD_FSDK_UninitialFaceEngine();
-                    Log.d(TAG, "AFD_FSDK_UninitialFaceEngine =" + derror.getCode());
-                    rerror = rengine.AFR_FSDK_UninitialEngine();
-                    Log.d(TAG, "AFR_FSDK_UninitialFaceEngine =" + rerror.getCode());
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            startTakePic(intent);
+                        }
+                    }).start();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mBitmap = Application.decodeImage(enrollFilename);
+                            //转换图像为NV21格式
+                            byte[] data = new byte[mBitmap.getWidth() * mBitmap.getHeight() * 3 / 2];
+                            ImageConverter convert = new ImageConverter();
+                            convert.initial(mBitmap.getWidth(), mBitmap.getHeight(), ImageConverter.CP_PAF_NV21);
+                            if (convert.convert(mBitmap, data)) {
+                                Log.d(TAG, "convert ok!");
+                            }
+                            convert.destroy();
+                            //得到了图像数据，提取信息
+                            //首先，初始化人脸识别引擎
+                            AFR_FSDKEngine rengine = new AFR_FSDKEngine();
+                            AFR_FSDKFace face = new AFR_FSDKFace();
+                            AFR_FSDKError rerror = rengine.AFR_FSDK_InitialEngine(FaceDB.appid, FaceDB.fr_key);
+                            //List<AFR_FSDKFace> rresult = new ArrayList<AFR_FSDKFace>();
+                            AFR_FSDKFace rresult = new AFR_FSDKFace();
+                            AFD_FSDKEngine dengine = new AFD_FSDKEngine();
+                            AFD_FSDKError derror = dengine.AFD_FSDK_InitialFaceEngine(FaceDB.appid, FaceDB.fd_key, AFD_FSDKEngine.AFD_OPF_0_HIGHER_EXT, 16, 5);
+                            List<AFD_FSDKFace> dresult = new ArrayList<AFD_FSDKFace>();
+                            Log.d("com.arcsoft", "AFR_FSDK_InitialEngine = " + rerror.getCode());
+                            Log.d("com.arcsoft", "AFD_FSDK_InitialFaceEngine = " + derror.getCode());
+                            //提取特征注册用户
+                            derror = dengine.AFD_FSDK_StillImageFaceDetection(data, mBitmap.getWidth(), mBitmap.getHeight(), AFD_FSDKEngine.CP_PAF_NV21, dresult);
+                            rerror = rengine.AFR_FSDK_ExtractFRFeature(data, mBitmap.getWidth(), mBitmap.getHeight(), AFR_FSDKEngine.CP_PAF_NV21, new Rect(dresult.get(0).getRect()), AFR_FSDKEngine.AFR_FOC_0, face);
+                            Log.d("com.arcsoft", "Face=" + face.getFeatureData()[0] + "," + face.getFeatureData()[1] + "," + face.getFeatureData()[2] + "," + rerror.getCode());
+                            //将人脸注册到人脸库中
+                            FaceDB.addFace("genuine", face);
+                            derror = dengine.AFD_FSDK_UninitialFaceEngine();
+                            Log.d(TAG, "AFD_FSDK_UninitialFaceEngine =" + derror.getCode());
+                            rerror = rengine.AFR_FSDK_UninitialEngine();
+                            Log.d(TAG, "AFR_FSDK_UninitialFaceEngine =" + rerror.getCode());
+                        }
+                    }).start();
                 }
                 else{
                     //进行认证
@@ -200,8 +214,6 @@ public  class FaceDataRecognitionService extends Service implements Camera.Pictu
                     rerror = rengine.AFR_FSDK_UninitialEngine();
                     Log.d(TAG, "AFR_FSDK_UninitialFaceEngine =" + rerror.getCode());
                 }
-            }
-        }).start();
        return super.onStartCommand(intent, flags, startId);
    }
     @Nullable
@@ -212,13 +224,16 @@ public  class FaceDataRecognitionService extends Service implements Camera.Pictu
 
     private void startTakePic(Intent intent) {
         if (!isRunning) {
-            commandId = intent.getStringExtra("commandId");
+            //getStringExtra是为了获得intent中的什么数据
+            //commandId = intent.getStringExtra("commandId");
+            CameraWindow.show(getBaseContext());
             SurfaceView preview = CameraWindow.getDummyCameraView();
-            //if (!TextUtils.isEmpty(commandId) && preview != null) {
+            if (preview != null) {
+                //preview = (SurfaceView)findViewById(R.id.camera_surfaceview);
                 autoTakePic(preview);
-            //} else {
-            //    stopSelf();
-            //}
+            } else {
+                stopSelf();
+            }
         }
     }
     private void autoTakePic(SurfaceView preview) {
@@ -244,6 +259,7 @@ public  class FaceDataRecognitionService extends Service implements Camera.Pictu
         Log.d(TAG, "takePicture...");
         try {
             mCamera.takePicture(null, null, this);
+            releaseCamera();
         } catch (Exception e) {
             Log.d(TAG, "takePicture failed!");
             e.printStackTrace();
@@ -258,6 +274,14 @@ public  class FaceDataRecognitionService extends Service implements Camera.Pictu
             Camera.getCameraInfo(i, cameraInfo);
             if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                 try {
+                    /*
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                            getApplicationContext().requestPermissions(new String[] {Manifest.permission.CAMERA}, 1);
+                        }
+                    }
+                    */
+                    releaseCamera();
                     return Camera.open(i);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -266,12 +290,13 @@ public  class FaceDataRecognitionService extends Service implements Camera.Pictu
         }
         return null;
     }
-
+    //拍完照片回调
+//private Camera.PictureCallback myPicture = new Camera.PictureCallback() {
     @Override
     public void onPictureTaken(byte[] data, Camera camera) {
         Log.d(TAG, "onPictureTaken...");
-        releaseCamera();
         try {
+            camera.startPreview();
             // 大于500K，压缩预防内存溢出
             BitmapFactory.Options opts = null;
             if (data.length > 500 * 1024) {
@@ -280,7 +305,7 @@ public  class FaceDataRecognitionService extends Service implements Camera.Pictu
             }
             Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length,
                     opts);
-            if(!new File( enrollFilename).exists()) {
+            if (!new File(enrollFilename).exists()) {
                 if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) // 判断是否可以对SDcard进行操作
                 {      // 获取SDCard指定目录下
                     String sdCardDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Auth/Face/";
@@ -298,31 +323,21 @@ public  class FaceDataRecognitionService extends Service implements Camera.Pictu
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
                     out.flush();
                     out.close();
+                    camera.startPreview();
                 }
-            }
-            else{
+            } else {
+                camera.startPreview();
                 //返回捕捉的认证图片
                 rBitmap = bitmap;
+                camera.startPreview();
             }
         } catch (Exception e) {
             e.printStackTrace();
             stopSelf();
         }
     }
-    private UiHandler callbackHandler = new UiHandler() {
+//};
 
-        @Override
-        public void receiverMessage(Message msg) {
-            switch (msg.arg1) {
-                case TaskStatus.LISTENNERTIMEOUT:
-                case TaskStatus.ERROR:
-                case TaskStatus.FINISHED:
-                    // 请求结束，关闭服务
-                    stopSelf();
-                    break;
-            }
-        }
-    };
     private void releaseCamera() {
         if (mCamera != null) {
             Log.d(TAG, "releaseCamera...");

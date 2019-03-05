@@ -29,7 +29,7 @@ public class SensorDataCollectingService extends Service implements SensorEventL
     public final String magDir = dir + "Mag/";
     public final String gyrDir = dir + "Gyr/";
     public final String featureVectorsFilename = dir + "FeatureVectors.txt";
-
+    public double[][] featureVectors={};
     private SensorManager sensorManager;
     private double[] gravity = {0, 0, 9.81};
 
@@ -100,11 +100,17 @@ public class SensorDataCollectingService extends Service implements SensorEventL
                                     System.out.println("acc数据" + accData);
                                     System.out.println("mag数据" + magData);
                                     System.out.println("gyr数据" + gyrData);
+                                    if(acc==null&&mag==null&&gyr==null){
+                                        break;
+                                    }
                                     saveRawFile(currentTime, acc, mag, gyr);
-
-                                final double[][] featureVectors = SensorFeatureExtraction.extract(
-                                        INTERVAL * MAX_GROUP_COUNT,
-                                        2, acc, mag, gyr);
+                                    if(acc!=null&&mag!=null&&gyr!=null) {
+                                        featureVectors = SensorFeatureExtraction.extract(
+                                            INTERVAL * MAX_GROUP_COUNT,
+                                            2, acc, mag, gyr); }
+                                            else{
+                                        break;
+                                    }
                                 //System.out.println("特征矩阵"+ featureVectors);
                                 //这个地方可能是太耗时就新写了个线程来运行
                                 new Thread(new Runnable() {
