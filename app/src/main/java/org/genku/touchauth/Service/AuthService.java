@@ -90,7 +90,7 @@ public class AuthService extends Service {
                           Log.d("faceauthtag","faceauth结束-True");
                       }
                       else{
-                          FileUtils.writeFile(authResultFilename, "True\r\n", true);
+                          FileUtils.writeFile(authResultFilename, "False\r\n", true);
                           Log.d("faceauthtag","faceauth结束-False");
                       }
 
